@@ -19,6 +19,7 @@ object Application extends Controller {
    * just an index action
    */
   def index = Action { implicit request =>
+    Logger.info("invoking index");
     Ok(views.html.index())
   }
 
@@ -28,8 +29,8 @@ object Application extends Controller {
    * (Simulates the REPL)
    */
   def execute = WebSocket.using[String] { request =>
+    Logger.info("invoking execute");
     val settings = new Settings
-
     // TODO do not allow imports for file and socket operations ??
     new File("lib").listFiles.foreach(f => {
       settings.classpath.append(f.getAbsolutePath)
@@ -49,14 +50,16 @@ object Application extends Controller {
       }
     }
 
-    def onReceive(str:String) = 
-        try {
-          Console.withOut(stream)(intp.interpret(str))
-        } catch {
-          case e : Throwable => outChannel.push("Unknown error: " + e.getMessage)
-        } finally {
-          stream.flush
-        }
+    def onReceive(str:String) =  {
+      Logger.info("received command: " + str);
+      try {
+        Console.withOut(stream)(intp.interpret(str))
+      } catch {
+        case e : Throwable => outChannel.push("Unknown error: " + e.getMessage)
+      } finally {
+        stream.flush
+      }
+    }
 
     val in = Iteratee.foreach(onReceive)
 
