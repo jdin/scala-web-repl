@@ -1,0 +1,15 @@
+@()(implicit request: RequestHeader)
+
+@main("Welcome to Play 2.1") {
+    
+<div id='container' class='container'>
+  <div id='title' class='title'> <h1>Interactive Scala</h1> </div>
+<div id='repl' class='repl'>
+  <div id='result'></div>
+  &gt;&nbsp;<input id='prompt'></input>
+</div>
+</div>
+<script>
+  function wsUrl() { return "@routes.Application.execute.webSocketURL()"; }
+</script>
+}

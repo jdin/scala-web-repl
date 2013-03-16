@@ -1,0 +1,45 @@
+@repl-bg: #191919;
+@repl-color: #dcdc9e;
+@result-color: #669991;
+
+body {
+  background-color: #2e2e2e;
+}
+
+.container {
+  .title {
+    text-align: center;
+    color: #e2e2b1;
+  }
+
+  .repl {
+    border: 10px solid;
+    border-color: @repl-bg;
+    font-family: "Lucida Console", Monaco, monospace;
+    height: 600px;
+    background-color: @repl-bg;
+    color: @repl-color;
+    overflow:scroll;
+  
+    #result {
+      color: @result-color;
+      .prev {
+        color: @repl-color;
+      }
+    }
+
+    input { 
+      color: @repl-color;
+      background-color: @repl-bg;
+      border: 0px solid;
+      width: 90%;
+      font-family: "Lucida Console", Monaco, monospace
+    }
+    
+    input:focus {
+      outline: none;
+      outline: 0; 
+     -webkit-box-shadow: none !important; -moz-box-shadow: none !important; box-shadow: none !important; 
+    }
+  }
+}
