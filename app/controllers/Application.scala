@@ -15,9 +15,6 @@ import models._
 
 object Application extends Controller {
   
-  val ScalaHome =
-    new File("which scala".!!).getParentFile.getParentFile.getAbsolutePath
-
   /**
    * just an index action
    */
@@ -34,12 +31,9 @@ object Application extends Controller {
     val settings = new Settings
 
     // TODO do not allow imports for file and socket operations ??
-    val allowed = List("scala-compiler.jar", "scala-library.jar")
-    new File(ScalaHome + "/lib").listFiles.foreach(f => {
-        if (allowed.contains(f.getName)) {
-          settings.classpath.append(f.getAbsolutePath)
-          settings.bootclasspath.append(f.getAbsolutePath)
-        }
+    new File("lib").listFiles.foreach(f => {
+      settings.classpath.append(f.getAbsolutePath)
+      settings.bootclasspath.append(f.getAbsolutePath)
     })
 
     val (out, outChannel) = Concurrent.broadcast[String]
