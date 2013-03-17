@@ -11,16 +11,12 @@ function onKey(event) {
       var prompt = $('#prompt');
       var command = prompt.val();
       history.save(command);
-      var prev = $('<div class="prev"></div>');
-      prev.text("> " + command);
-      $('#result').append(prev);
       
+      prompt.prop('disabled', true);
+      // TODO start waiting
       // send GET
       $.get("exec", {cmd: command}, processResult);
-
-      prompt.val('');
-      history.reset();
-      break;
+     break;
     case 38: // UP
       var prompt = $('#prompt');
       var hist = history.getPrevCmd();
@@ -93,11 +89,21 @@ var history = {
 // and every line is added as a 
 // separate div to result
 function processResult(result) {
+  var prompt = $('#prompt'); 
+  var prev = $('<div class="prev"></div>');
+  prev.text("> " + prompt.val());
+  $('#result').append(prev);
+   
   var lines = result.split(/\n/);
   for(i in lines) {
     addLineToResult(lines[i]);
   }
-  $('#repl').scrollTop($('#repl').height())
+
+  prompt.prop('disabled', false);
+  prompt.val('');
+  history.reset();
+  // TODO stop waiting 
+  $('#repl').scrollTop($('#repl').height());
 }
 
 // invoked when message is recieved
