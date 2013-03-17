@@ -103,7 +103,7 @@ function processResult(result) {
   prompt.val('');
   history.reset();
   // TODO stop waiting 
-  $('#repl').scrollTop($('#repl').height());
+  $('#repl').scrollTop(9999999999);//FIXME $('#repl').height());
 }
 
 // invoked when message is recieved
