@@ -82,6 +82,7 @@ var history = {
   // never null
   getAll: function() {
     var hist = localStorage["commandHistory"];
+    if (!hist) return new Array();
     var lines = hist.split(/\n/);
     return lines;
   }
