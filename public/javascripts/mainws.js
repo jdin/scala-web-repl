@@ -1,6 +1,12 @@
 // main js script
+var socket;
 
 $(document).ready(function() {
+  localStorage["commandHistory"] = ""; // empty from the beginning
+  var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+  socket = new WS(wsUrl());
+  socket.onmessage = onMessage;
+  
   $(document).keydown(onKey);
   window.setInterval(function() { $('#prompt').focus(); }, 500);
 });
@@ -14,10 +20,7 @@ function onKey(event) {
       var prev = $('<div class="prev"></div>');
       prev.text("> " + command);
       $('#result').append(prev);
-      
-      // send GET
-      $.get("exec", {cmd: command}, processResult);
-
+      socket.send(command);
       prompt.val('');
       history.reset();
       break;
@@ -87,12 +90,12 @@ var history = {
   }
 }
 
-// Parsing result:
+// on socket message received
 // the string is splitted to lines 
 // and every line is added as a 
 // separate div to result
-function processResult(result) {
-  var lines = result.split(/\n/);
+function onMessage(event) {
+  var lines = event.data.split(/\n/);
   for(i in lines) {
     addLineToResult(lines[i]);
   }

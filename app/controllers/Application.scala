@@ -4,6 +4,8 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
+import play.api.cache.Cache;
+import play.api.Play.current;
 
 import scala.tools.nsc._
 import java.io.File
@@ -15,12 +17,26 @@ import models._
 
 object Application extends Controller {
   
+  
   /**
    * just an index action
    */
   def index = Action { implicit request =>
     Logger.info("invoking index");
-    Ok(views.html.index())
+    val interpreter = new MyInterpreter("settings"); // TODO
+    val intprId = "" + System.currentTimeMillis();
+    Logger.info("saving int with id " + intprId);
+    Cache.set(intprId, interpreter);
+    Ok(views.html.index()).withSession( "intprId" -> intprId );
+  }
+
+  def exec(cmd:String) = Action { request =>
+    Logger.info("invoking exec with cmd " + cmd);
+    val intprId = request.session.get("intprId").get;
+    Logger.info("intprId for this session " + intprId);
+    val int = Cache.getAs[MyInterpreter](intprId).get;
+    Logger.info("invoking exec with interpreter " + int.hashCode);
+    Ok(int.exec(cmd)); // TODO async
   }
 
   /**
