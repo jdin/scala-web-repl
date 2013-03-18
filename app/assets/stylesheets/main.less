@@ -2,26 +2,44 @@
 @repl-color: #dcdc9e;
 @result-color: #669991;
 
-body {
-  background-color: #2e2e2e;
+html, body {
+  background-color: #79c3d2;
+  height: 100%;
+  min-height: 100%;
 }
 
-.container {
+.container-fluid {
+  height: 100%;
+  min-height: 100%;
+}
+
+.row-fluid {
+  height: 100%;
+  min-height: 100%; 
+}
+
+.cont {
+  height: 80%;
+  min-height: 80%;
+
   .title {
     text-align: center;
-    color: #e2e2b1;
+    color: #143352;
+    text-shadow: 0px 1px 1px #e6ebe0;
   }
 
   .repl {
-    height: 500px;
+    height: 100%;
+    min-height:100%;
     border: 10px solid;
     border-color: @repl-bg;
     font-family: "Lucida Console", Monaco, monospace;
     background-color: @repl-bg;
     color: @repl-color;
-    overflow:scroll;
+    overflow: auto;
     -moz-border-radius: 15px;
     border-radius: 15px;
+    box-shadow: 0 0px 15px rgba(0, 0, 0, 0.5);
   
     #result {
       color: @result-color;
