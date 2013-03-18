@@ -6,7 +6,6 @@ html, body {
   background-color: #79c3d2;
   height: 100%;
   min-height: 100%;
-  overflow: hidden;
 }
 
 .container-fluid {
@@ -17,6 +16,16 @@ html, body {
 .row-fluid {
   height: 100%;
   min-height: 100%; 
+}
+
+.sidebar {
+  height: 100%;
+  min-height: 100%;
+  background-color: #d9eef2;
+}
+
+.footer {
+  text-align: center;
 }
 
 .cont {
@@ -37,7 +46,7 @@ html, body {
     font-family: "Lucida Console", Monaco, monospace;
     background-color: @repl-bg;
     color: @repl-color;
-    overflow-y: scroll;
+    overflow: auto;
     -moz-border-radius: 15px;
     border-radius: 15px;
     box-shadow: 0 0px 15px rgba(0, 0, 0, 0.5);
