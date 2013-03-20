@@ -10,11 +10,15 @@ class MyInterpreter(name:String) {
 
   lazy val settings = { 
     val s = new Settings
+    val jars = List("scala-compiler.jar", "scala-library.jar")
+    def findLibs(f:File):Unit = 
+      if(f.isDirectory) f.listFiles.foreach(findLibs)
+      else if (jars.contains(f.getName)) {
+        s.classpath.append(f.getAbsolutePath)
+        s.bootclasspath.append(f.getAbsolutePath)
+      }
+    findLibs(new File("."))
     // TODO do not allow imports for file and socket operations ??
-    new File("lib").listFiles.foreach(f => {
-      s.classpath.append(f.getAbsolutePath)
-      s.bootclasspath.append(f.getAbsolutePath)
-    })
     s
   }
 
