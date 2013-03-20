@@ -1,19 +1,26 @@
 @()(implicit request: RequestHeader)
 
-@main("Interactive Scala") {
+@main("Try Scala") {
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span4 sidebar">
       <!--Sidebar content-->
+      <div id='title' class='title'><h1>Try Scala</h1></div>
+      <div id='text' class='well'>
+        <p>Welcome to Scala! You can see Scala Interpreter on the right. We call it a REPL.</p>
+        <p> ... </p>
+        <p>Type <code>:next</code> to continue.</p>
+      </div>
     </div>
     <!--Body content-->
     <div id='container' class='cont span8'>
-      <div id='title' class='title'> <h1>Interactive Scala</h1> </div>
       <div id='repl' class='repl'>
-        <div id='result'></div>
+        <div id='result'>
+          <div>Welcome to Web Scala BETA<br>Type in expressions to have them evaluated.</div>
+        </div>
         &gt;&nbsp;<input id='prompt'></input>
       </div>
-      <div class='footer'>© 2013 jdinosaurus</div>
+      <div class='footer'><small>© 2013 <a href='mailto:jdinosaurus&#64;gmail.com'> jdinosaurus</a></small></div>
     </div>
   </div>
 </div>
