@@ -1,4 +1,2 @@
-This is your new Play 2.1 application
+This is an attempt to create an Interactive Scala School using HTML5 and Scala REPL
 =====================================
-
-This file will be packaged with your application, when using `play dist`.
