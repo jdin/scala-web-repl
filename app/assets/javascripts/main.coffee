@@ -12,10 +12,11 @@ onKey = (event) ->
       command = prompt.val()
       history.save command
       prompt.prop 'disabled', true
-      # TODO start waiting
+      # start waiting
+      $('.loader').show()
       result = $.get 'exec', {cmd: command}
       result.success (r)-> handler.onSuccess(r)
-      result.fail (e) -> handler.onError(e)
+      result.fail (jqXHR, status, e) -> handler.onError(e)
     when 38 # UP
       hist = history.getPrevCmd()
       prompt.val if hist then hist else ""
@@ -40,7 +41,9 @@ class ServerHandler
     @prompt.val ''
     history.reset()
     @repl.scrollTop 999999 # FIXME
+    $('.loader').hide()
   onError: (error) ->
+    $('.loader').hide()
     console.log error
     alert error
   addToResult: (str) ->
