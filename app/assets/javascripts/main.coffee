@@ -1,4 +1,3 @@
-
 $ ->
   $(document).keydown onKey
   prompt = $('#prompt')
@@ -46,7 +45,7 @@ class ServerHandler
     alert error
   addToResult: (str) ->
     line = $('<div/>')
-    line.text str
+    line.text str 
     @result.append line
 
 class History
