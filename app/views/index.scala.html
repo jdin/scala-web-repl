@@ -18,16 +18,10 @@
     <div id='container' class='cont span8'>
       <div id='repl' class='repl'>
         <div id='result'>Welcome to Web Scala BETA<br>Type in expressions to have them evaluated.</div>
-        &gt;&nbsp;<input id='prompt'/>
-        <br>
-        <img src='@routes.Assets.at("images/loader.gif")' class='loader'/>
+        <div id='placeholder'>&gt;</div><img src='@routes.Assets.at("images/loader.gif")' class='loader'/>&nbsp;<input id='prompt'/>
       </div>
       <div class='footer'><small>© 2013 <a href='mailto:jdinosaurus&#64;gmail.com'> jdinosaurus</a></small></div>
     </div>
   </div>
 </div>
-    
-<script>
-  function wsUrl() { return "@routes.Application.execute.webSocketURL()"; }
-</script>
 }

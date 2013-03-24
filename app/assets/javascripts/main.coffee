@@ -6,14 +6,15 @@ $ ->
 
 onKey = (event) ->
   prompt = $('#prompt')
-  handler = new ServerHandler
+  loader = new LoadIndicator
+  handler = new ServerHandler loader
   switch event.which
     when 13 # ENTER 
       command = prompt.val()
       history.save command
       prompt.prop 'disabled', true
       # start waiting
-      $('.loader').show()
+      loader.show()
       result = $.get 'exec', {cmd: command}
       result.success (r)-> handler.onSuccess(r)
       result.fail (jqXHR, status, e) -> handler.onError(e)
@@ -26,8 +27,19 @@ onKey = (event) ->
       prompt.val if hist then hist else ""
       event.preventDefault()
 
-class ServerHandler
+class LoadIndicator
   constructor: () ->
+    @loader = $('.loader')
+    @placeholder = $('#placeholder')
+  show: () ->
+    @loader.show()
+    @placeholder.hide()
+  hide: () ->
+    @loader.hide()
+    @placeholder.show()
+
+class ServerHandler
+  constructor: (@loader) ->
     @prompt = $('#prompt')
     @result = $('#result')
     @repl = $('#repl')
@@ -41,9 +53,9 @@ class ServerHandler
     @prompt.val ''
     history.reset()
     @repl.scrollTop 999999 # FIXME
-    $('.loader').hide()
+    @loader.hide()
   onError: (error) ->
-    $('.loader').hide()
+    @loader.hide()
     console.log error
     alert error
   addToResult: (str) ->
