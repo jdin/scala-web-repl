@@ -29,14 +29,17 @@ onKey = (event) ->
 
 class LoadIndicator
   constructor: () ->
-    @loader = $('.loader')
     @placeholder = $('#placeholder')
+    @rotation = ['/', '-', '\\', '|']
+    @i = 0
   show: () ->
-    @loader.show()
-    @placeholder.hide()
+    @f = window.setInterval(@setElement, 200)
   hide: () ->
-    @loader.hide()
-    @placeholder.show()
+    window.clearInterval @f
+    @placeholder.text ">"
+  setElement: () =>
+    @placeholder.text @rotation[@i++]
+    @i = 0 if @i == @rotation.length
 
 class ServerHandler
   constructor: (@loader) ->
