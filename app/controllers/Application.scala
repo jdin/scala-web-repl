@@ -18,7 +18,7 @@ object Application extends Controller {
     val intprId = "" + System.currentTimeMillis();
     Logger.info("saving int with id " + intprId);
     Cache.set(intprId, interpreter);
-    Ok(views.html.index()).withSession( "intprId" -> intprId );
+    Ok(views.html.index()).withSession( "interpreter" -> intprId );
   }
 
   /**
@@ -27,16 +27,10 @@ object Application extends Controller {
    */
   def exec(cmd:String) = Action { request =>
     Logger.debug("invoking exec with cmd " + cmd);
-    val intprId = request.session.get("intprId").get;
+    val intprId = request.session.get("interpreter").get;
     Logger.debug("intprId for this session " + intprId);
     val int = Cache.getAs[MyInterpreter](intprId).get;
     Logger.debug("invoking exec with interpreter " + int.hashCode);
     Ok(int.exec(cmd)); // TODO async ?
   }
-
-  def page(path:String) = Action { request =>
-    Logger.debug("request for page "+path)
-    Ok(views.html.welcome())
-  }
-
 }
