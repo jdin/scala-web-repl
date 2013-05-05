@@ -17,11 +17,10 @@ object Application extends Controller {
    */
   def index = Action { implicit request =>
     Logger.debug("invoking index");
-    val interpreter = new MyInterpreter("settings"); 
-    val intprId = "" + System.currentTimeMillis();
-    Logger.info("saving int with id " + intprId);
-    Cache.set(intprId, interpreter);
-    Ok(views.html.index()).withSession( "interpreter" -> intprId );
+    val interpreter = new MyInterpreter("settings")
+    val intprId = String.valueOf(System.currentTimeMillis())
+    Cache.set(intprId, interpreter)
+    Ok(views.html.index()).withSession( "interpreter" -> intprId )
   }
 
   /**
@@ -29,16 +28,17 @@ object Application extends Controller {
    * and returns the result as a String
    */
   def exec(cmd:String) = Action { request =>
-    Logger.debug("invoking exec with cmd " + cmd);
-    val intprId = request.session.get("interpreter").get;
-    Logger.debug("intprId for this session " + intprId);
-    val interpreter = Cache.getAs[MyInterpreter](intprId).get;
-    Logger.debug("invoking exec with interpreter " + interpreter.hashCode);
-    val futureResult = scala.concurrent.Future {
-      interpreter exec cmd
-    }
+    val interpreter = for {
+      id <- request.session.get("interpreter")
+      interpreter <- Cache.getAs[MyInterpreter](id)
+    } yield interpreter
     Async {
-      futureResult.map { result => Ok(result) }
+      interpreter match {
+        case Some(i) => 
+          val futureResult = Future { i exec cmd }
+          futureResult map { result => Ok(result) }
+        case None => Future { InternalServerError("oops") }
+      } 
     }
   }
 }
