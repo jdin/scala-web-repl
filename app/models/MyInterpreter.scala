@@ -30,8 +30,6 @@ class MyInterpreter(name:String) {
     try {
       Console.withOut(stream)(intp.interpret(cmd));
       baos.toString
-    } catch {
-      case e : Throwable => "Error: " + e.getMessage
     } finally {
       stream.flush
     }
