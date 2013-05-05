@@ -7,6 +7,9 @@ import play.api.Play.current;
 
 import models._
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
 object Application extends Controller {
   
   /**
@@ -29,8 +32,13 @@ object Application extends Controller {
     Logger.debug("invoking exec with cmd " + cmd);
     val intprId = request.session.get("interpreter").get;
     Logger.debug("intprId for this session " + intprId);
-    val int = Cache.getAs[MyInterpreter](intprId).get;
-    Logger.debug("invoking exec with interpreter " + int.hashCode);
-    Ok(int.exec(cmd)); // TODO async ?
+    val interpreter = Cache.getAs[MyInterpreter](intprId).get;
+    Logger.debug("invoking exec with interpreter " + interpreter.hashCode);
+    val futureResult = scala.concurrent.Future {
+      interpreter exec cmd
+    }
+    Async {
+      futureResult.map { result => Ok(result) }
+    }
   }
 }
