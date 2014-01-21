@@ -5,8 +5,9 @@ This is an attempt to create an Interactive Scala School using HTML5 and Scala R
 
 Still work in progress. The current state can be seen [here](http://try-scala.herokuapp.com/)
 
-# This software is licensed under MIT License
-**
+# License
+
+This software is licensed under MIT License
 
 The MIT License (MIT)
 
