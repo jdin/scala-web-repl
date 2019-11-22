@@ -18,3 +18,5 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions ++= Seq("-Ypartial-unification")
+
+enablePlugins(JavaAppPackaging)

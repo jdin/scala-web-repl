@@ -1,5 +1,7 @@
 package org.jdin.repl
 
+import java.nio.charset.StandardCharsets
+
 import org.http4s.dsl.io._
 import org.http4s.implicits._
 import java.util.UUID
@@ -30,10 +32,11 @@ object Service {
       .build(cacheLoader)
 
   private def toString(body: org.http4s.EntityBody[IO]): IO[String] =
-    body.map(_.toChar)
+    body
       .compile
       .toList
-      .map(_.mkString)
+      .map(_.toArray)
+      .map(bytes => new String(bytes, StandardCharsets.UTF_8))
 
   val service: Kleisli[IO, Request[IO], Response[IO]] = HttpRoutes.of[IO] {
     case request@GET -> Root =>

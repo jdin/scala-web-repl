@@ -7,7 +7,7 @@ Client/Server Application that imitates Scala REPL in a browser
 ## How to build
 
 ```shell script
-sbt assembly
+sbt universal:packageBin
 ```
 
 ## How to start
@@ -19,7 +19,8 @@ sbt run
 
 Production mode:
 ```shell script
-java jar target/scala-2.12/scala-web-repl-assembly-1.0.0.jar
+sbt stage
+./target/universal/stage/bin/scala-web-repl 
 ```
 
 ## License
