@@ -52,8 +52,6 @@
       // utils
       // =====
 
-      const defer = Promise.resolve().then.bind(Promise.resolve());
-
       const refDir = directive(refInstance => part => {
         if (!(part instanceof AttributePart)) {
           throw new Error(
@@ -100,7 +98,9 @@
 
       const App = () => {
         const [loading, setLoading] = useState(false);
+        const [archive, setArchive] = useState([]);
         const [history, setHistory] = useState([]);
+        const [index, setIndex] = useState(-1);
         const inputRef = useRef();
 
         useEffect(() => {
@@ -111,22 +111,32 @@
 
         const onKeyUp = useCallback(
           e => {
-            if (e.code === "Enter") {
-              const code = inputRef.current.value;
-              defer(async () => {
-                setLoading(true);
-                try {
-                  const result = await interpret(code);
-                  setHistory([...history, `> ${code}`, result]);
-                } finally {
-                  setLoading(false);
-                  inputRef.current.value = "";
-                  setTimeout(() => inputRef.current.focus());
-                }
-              });
+            e.preventDefault();
+            switch (e.code) {
+              case "Enter":
+                const code = inputRef.current.value;
+                (async () => {
+                  setLoading(true);
+                  try {
+                    const result = await interpret(code);
+                    setHistory([code, ...history]);
+                    setArchive([...archive, `> ${code}`, result]);
+                  } finally {
+                    setLoading(false);
+                    inputRef.current.value = "";
+                    setTimeout(() => inputRef.current.focus());
+                  }
+                })();
+                break;
+              case "ArrowUp":
+                if (index < history.length - 1) setIndex(index + 1);
+                break;
+              case "ArrowDown":
+                setIndex(index > 0 ? index - 1 : -1);
+                break;
             }
           },
-          [inputRef, ...history]
+          [inputRef, ...archive, ...history, index]
         );
 
         return html`
@@ -154,7 +164,7 @@
             }
           </style>
           <pre class="banner">${BANNER}</pre>
-          ${history.map(
+          ${archive.map(
             line =>
               html`
                 <pre class=${line.startsWith(">") ? "select" : ""}>${line}</pre>
@@ -167,6 +177,7 @@
             <input
               class="select"
               type="text"
+              .value=${index >= 0 ? history[index] : null}
               @keyup="${onKeyUp}?"
               ref=${refDir(inputRef)}
               ?disabled=${loading}
