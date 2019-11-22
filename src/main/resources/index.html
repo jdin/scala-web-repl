@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scala Web Repl</title>
+    <style>
+      :root {
+        --theme-background-color: #2b2b2b;
+        --theme-color: #a9b7c6;
+        --theme-secondary-color: #ffc66d;
+        --theme-banner-color: #629755;
+        --theme-font-family: "Ubuntu Mono", monospace;
+        --theme-font-size: 20px;
+      }
+
+      body {
+        color: var(--theme-color);
+        background-color: var(--theme-background-color);
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css?family=Ubuntu+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <sr-app></sr-app>
+    <script type="module">
+      import {
+        html,
+        directive,
+        AttributePart
+      } from "https://unpkg.com/lit-html/lit-html.js";
+      import {
+        component,
+        useState,
+        useRef,
+        useEffect,
+        useCallback
+      } from "https://unpkg.com/haunted/haunted.js";
+
+      const BANNER = `
+ _____ _____ _____ __    _____    _ _ _ _____ _____    _____ _____ _____ __
+|   __|     |  _  |  |  |  _  |  | | | |   __| __  |  | __  |   __|  _  |  |
+|__   |   --|     |  |__|     |  | | | |   __| __ -|  |    -|   __|   __|  |__
+|_____|_____|__|__|_____|__|__|  |_____|_____|_____|  |__|__|_____|__|  |_____|
+      `;
+
+      const symbols = ["\\", "|", "/", "-", "\\", "|", "/", "-"];
+
+      // =====
+      // utils
+      // =====
+
+      const defer = Promise.resolve().then.bind(Promise.resolve());
+
+      const refDir = directive(refInstance => part => {
+        if (!(part instanceof AttributePart)) {
+          throw new Error(
+            `ref directive can only be used as an attribute: but ${part}`
+          );
+        }
+        refInstance.current = part.committer.element;
+      });
+
+      // ===
+      // api
+      // ===
+
+      const interpret = code =>
+        fetch("/interpret", {
+          method: "POST",
+          body: code
+        }).then(r => r.text());
+
+      // ==========
+      // components
+      // ==========
+
+      const Loader = ({ loading }) => {
+        const [index, setIndex] = useState(0);
+        useEffect(() => {
+          if (loading) {
+            setTimeout(
+              () => setIndex(index === symbols.length - 2 ? 0 : index + 1),
+              500
+            );
+          }
+        }, [loading, index]);
+        return html`
+          ${loading ? symbols[index] : ">"}
+        `;
+      };
+      const observedAttributes = ["loading"];
+      customElements.define(
+        "sr-loader",
+        component(Loader, { observedAttributes })
+      );
+
+      const App = () => {
+        const [loading, setLoading] = useState(false);
+        const [history, setHistory] = useState([]);
+        const inputRef = useRef();
+
+        useEffect(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, [inputRef]);
+
+        const onKeyUp = useCallback(
+          e => {
+            if (e.code === "Enter") {
+              const code = inputRef.current.value;
+              defer(async () => {
+                setLoading(true);
+                try {
+                  const result = await interpret(code);
+                  setHistory([...history, `> ${code}`, result]);
+                } finally {
+                  setLoading(false);
+                  inputRef.current.value = "";
+                  setTimeout(() => inputRef.current.focus());
+                }
+              });
+            }
+          },
+          [inputRef, ...history]
+        );
+
+        return html`
+          <style>
+            * {
+              font-family: var(--theme-font-family), monospace;
+              font-size: var(--theme-font-size);
+              user-select: none;
+            }
+            div {
+              margin-top: 0.5em;
+            }
+            div.input {
+              display: inline;
+              width: 100%;
+              margin: 0;
+            }
+            input {
+              width: calc(100% - 1em - 2px);
+              border: 0;
+              outline: none;
+              background-color: var(--theme-background-color);
+              margin-top: 0.5em;
+            }
+            .select {
+              color: var(--theme-secondary-color);
+            }
+            .banner {
+              color: var(--theme-banner-color);
+            }
+          </style>
+          <pre class="banner">${BANNER}</pre>
+          ${history.map(
+            line =>
+              html`
+                <div class=${line.startsWith(">") ? "select" : ""}>${line}</div>
+              `
+          )}
+          <div class="input">
+            <span class="select"
+              ><sr-loader ?loading=${loading}></sr-loader
+            ></span>
+            <input
+              class="select"
+              type="text"
+              @keyup="${onKeyUp}?"
+              ref=${refDir(inputRef)}
+              ?disabled=${loading}
+              @focusout=${() => inputRef.current.focus()}
+            />
+          </div>
+        `;
+      };
+
+      customElements.define("sr-app", component(App));
+    </script>
+  </body>
+</html>
