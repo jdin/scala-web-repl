@@ -119,6 +119,7 @@
                   setLoading(true);
                   try {
                     const result = await interpret(code);
+                    setIndex(-1);
                     setHistory([code, ...history]);
                     setArchive([...archive, `> ${code}`, result]);
                   } finally {
