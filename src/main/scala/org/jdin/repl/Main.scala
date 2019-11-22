@@ -1,63 +1,15 @@
 package org.jdin.repl
 
-import java.util.UUID
-import java.util.concurrent.{Executors, TimeUnit}
-
 import cats.effect.{IO, _}
 import cats.implicits._
-import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
-import org.http4s.dsl.io._
-import org.http4s.implicits._
 import org.http4s.server.blaze._
-import org.http4s.{HttpRoutes, ResponseCookie, StaticFile, headers}
-
-import scala.concurrent.ExecutionContext
 
 object Main extends IOApp {
-
-  private val blockingEc =
-    ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
-
-  private implicit val cs: ContextShift[IO] =
-    IO.contextShift(ExecutionContext.global)
-
-  private val cacheLoader = new CacheLoader[UUID, Interpreter] {
-    override def load(key: UUID): Interpreter = Interpreter(key)
-  }
-
-  private val cache: LoadingCache[UUID, Interpreter] = CacheBuilder.newBuilder
-    .expireAfterAccess(20, TimeUnit.MINUTES)
-    .build(cacheLoader)
-
-  private def toString(body: org.http4s.EntityBody[IO]): IO[String] =
-    body.map(_.toChar)
-      .compile
-      .toList
-      .map(_.mkString)
-
-  private val helloWorldService = HttpRoutes.of[IO] {
-    case request@GET -> Root =>
-      StaticFile.fromResource("/index.html", blockingEc, Some(request))
-        .getOrElseF(NotFound())
-    case request@POST -> Root / "interpret" =>
-      val uuidString: Either[String, String] = for {
-        header <- headers.Cookie.from(request.headers).toRight("Cookie parsing error")
-        cookie <- header.values.toList.find(_.name == "repl-id").toRight("Couldn't find repl id cookie")
-        uuid <- Right(cookie.content)
-      } yield (uuid)
-      val uuid = uuidString match {
-        case Right(uuid) => UUID.fromString(uuid)
-        case  _ => UUID.randomUUID()
-      }
-      val interpreter = cache.get(uuid)
-      Ok(toString(request.body).map(interpreter.interpret))
-        .map(_.addCookie(ResponseCookie("repl-id", uuid.toString)))
-  }.orNotFound
 
   override def run(args: List[String]): IO[ExitCode] =
     BlazeServerBuilder[IO]
       .bindHttp(8080, "localhost")
-      .withHttpApp(helloWorldService)
+      .withHttpApp(Service.service)
       .serve
       .compile
       .drain
