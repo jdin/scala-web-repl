@@ -6,9 +6,11 @@ import org.http4s.server.blaze._
 
 object Main extends IOApp {
 
+  private val PORT = sys.env.getOrElse("PORT", "8080")
+
   override def run(args: List[String]): IO[ExitCode] =
     BlazeServerBuilder[IO]
-      .bindHttp(8080, "localhost")
+      .bindHttp(PORT.toInt, "localhost")
       .withHttpApp(Service.service)
       .serve
       .compile
