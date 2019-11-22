@@ -1,6 +1,6 @@
 # Scala Web REPL
 
-Server / Client Application that imitates Scala REPL in a browser
+Client/Server Application that imitates Scala REPL in a browser
 
 ![Screenshot](screenshot.gif)
 
