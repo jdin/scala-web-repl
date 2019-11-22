@@ -91,6 +91,7 @@
           ${loading ? symbols[index] : ">"}
         `;
       };
+
       const observedAttributes = ["loading"];
       customElements.define(
         "sr-loader",
@@ -135,20 +136,15 @@
               font-size: var(--theme-font-size);
               user-select: none;
             }
-            div {
-              margin-top: 0.5em;
-            }
             div.input {
               display: inline;
               width: 100%;
-              margin: 0;
             }
             input {
               width: calc(100% - 1em - 2px);
               border: 0;
               outline: none;
               background-color: var(--theme-background-color);
-              margin-top: 0.5em;
             }
             .select {
               color: var(--theme-secondary-color);
@@ -161,7 +157,7 @@
           ${history.map(
             line =>
               html`
-                <div class=${line.startsWith(">") ? "select" : ""}>${line}</div>
+                <pre class=${line.startsWith(">") ? "select" : ""}>${line}</pre>
               `
           )}
           <div class="input">
