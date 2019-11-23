@@ -10,7 +10,7 @@ object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] =
     BlazeServerBuilder[IO]
-      .bindHttp(PORT.toInt, "localhost")
+      .bindHttp(PORT.toInt, "0.0.0.0")
       .withHttpApp(Service.service)
       .serve
       .compile
